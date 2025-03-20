@@ -1,4 +1,6 @@
-#[derive(clap::SubCommand, Debug, Clone)]
+use clap::Parser;
+
+#[derive(Parser, Debug, Clone)]
 pub enum Command {
     /// 저장된 OTP 키 목록 표시
     #[clap(name = "list", about = "저장된 모든 OTP 키 목록 표시")]

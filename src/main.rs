@@ -1,5 +1,8 @@
+use clap::Parser as _;
+use commands::Command;
+
 mod commands;
 
 fn main() {
-    println!("Hello, world!");
+    let command = Command::parse();
 }
