@@ -1,5 +1,6 @@
 mod commands;
 mod config;
+mod otp;
 
 use clap::Parser as _;
 use commands::Command;
