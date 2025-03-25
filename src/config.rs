@@ -1,5 +1,6 @@
-use std::fs::File;
-use std::io::{self, Read as _, Write as _};
+use std::fs::{self, File, OpenOptions, Permissions};
+use std::io::{self, Read as _, Seek as _, SeekFrom, Write as _};
+use std::os::unix::fs::PermissionsExt as _;
 use std::path::PathBuf;
 use std::env;
 use std::sync::OnceLock;
@@ -27,23 +28,33 @@ fn load_config() -> Result<Config> {
     };
     
     let config_path = home_dir.join(".otpc").join("config.toml");
-    let mut config_file = File::open(config_path.clone())?;
+    fs::create_dir_all(home_dir.join(".otpc"))?;
+
+    let mut config_file = match File::open(&config_path) {
+        Ok(file) => file,
+        Err(e) => {
+            if e.kind() == io::ErrorKind::NotFound {
+                let mut new_config_file = OpenOptions::new()
+                    .create(true)
+                    .write(true)
+                    .read(true)
+                    .open(&config_path)?;
+                new_config_file.set_permissions(Permissions::from_mode(0o600))?;
+
+                let new_config = Config { accounts: vec![] };
+                let new_config_str = toml::to_string(&new_config).map_err(|e| anyhow::anyhow!(e))?;
+                new_config_file.write_all(new_config_str.as_bytes())?;
+
+                new_config_file.seek(SeekFrom::Start(0))?;
+                new_config_file
+            } else {
+                return Err(anyhow::anyhow!(e));
+            }
+        }
+    };
 
     let mut config_str = String::new();
-    if let Err(e) = config_file.read_to_string(&mut config_str) {
-        if e.kind() != io::ErrorKind::NotFound {
-            return Err(anyhow::anyhow!(e));
-        }
-
-        // make new config file
-        let mut new_config_file = File::create(config_path)?;
-
-        let new_config = Config { accounts: vec![] };
-        let new_config_str = toml::to_string(&new_config).map_err(|e| anyhow::anyhow!(e))?;
-        new_config_file.write_all(new_config_str.as_bytes())?;
-
-        return Ok(new_config);
-    }
+    config_file.read_to_string(&mut config_str)?;
 
     let config: Config = toml::from_str(&config_str).map_err(|e| anyhow::anyhow!(e))?;
     Ok(config)
