@@ -1,6 +1,7 @@
 mod commands;
 mod config;
 mod otp;
+mod qrcode;
 
 use clap::Parser as _;
 use commands::Command;
