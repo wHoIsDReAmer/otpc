@@ -2,42 +2,42 @@ use clap::Parser;
 
 #[derive(Parser, Debug, Clone)]
 pub enum Command {
-    /// 저장된 OTP 키 목록 표시
-    #[clap(name = "list", about = "저장된 모든 OTP 키 목록 표시")]
+    /// Show all saved OTP keys
+    #[clap(name = "list", about = "Show all saved OTP keys")]
     List,
     
-    /// 특정 계정의 현재 OTP 코드 생성
-    #[clap(name = "code", about = "특정 계정의 현재 OTP 코드 생성")]
+    /// Generate the current OTP code for a specific account
+    #[clap(name = "code", about = "Generate the current OTP code for a specific account")]
     Code {
-        /// 계정 이름 또는 ID
+        /// The name or ID of the account
         #[clap(long, short)]
         account: String,
     },
     
-    /// OTP 키 삭제
-    #[clap(name = "delete", about = "저장된 OTP 키 삭제")]
+    /// Delete an account
+    #[clap(name = "delete", about = "Delete an account")]
     Delete {
-        /// 삭제할 계정 이름 또는 ID
+        /// The name or ID of the account to delete
         #[clap(long, short)]
         account: String,
     },
     
-    /// QR 코드에서 OTP 키 가져오기
-    #[clap(name = "import", about = "QR 코드 이미지에서 OTP 키 가져오기")]
+    /// Import an OTP key from a QR code image
+    #[clap(name = "import", about = "Import an OTP key from a QR code image")]
     Import {
-        /// QR 코드 이미지 파일 경로
+        /// The path to the QR code image file
         #[clap(long, short)]
         file: std::path::PathBuf,
     },
 
-    /// OTP 키 불러오기
-    #[clap(name = "load", about = "OTP 키 불러오기")]
+    /// Load an OTP key
+    #[clap(name = "load", about = "Load an OTP key")]
     Load {
-        /// OTP 시크릿 키
+        /// The OTP secret key
         #[clap(long, short)]
         secret: String,
 
-        /// 계정 이름
+        /// The account name
         #[clap(long, short)]
         account: String,
     },

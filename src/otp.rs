@@ -1,31 +1,31 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::fmt;
 
-/// OTP 타입 (TOTP 또는 HOTP)
+/// OTP Type (TOTP or HOTP)
 pub enum OtpType {
-    /// 시간 기반 일회용 비밀번호
+    /// Time-based OTP (TOTP)
     Totp,
-    /// HMAC 기반 일회용 비밀번호
+    /// HMAC-based OTP (HOTP)
     Hotp,
 }
 
-/// OTP 알고리즘 구현
-/// 참조 RFC: https://datatracker.ietf.org/doc/html/rfc4226
+/// OTP Algorithm Implementation
+/// Reference RFC: https://datatracker.ietf.org/doc/html/rfc4226
 pub struct Otp {
-    /// 비밀 키
+    /// Secret Key
     secret: Vec<u8>,
-    /// 자릿수 (기본값: 6)
+    /// Digits (Default: 6)
     digits: u32,
-    /// 시간 간격 (초 단위, 기본값: 30)
+    /// Time Interval (Seconds, Default: 30)
     period: u64,
-    /// OTP 타입
+    /// OTP Type
     otp_type: OtpType,
 }
 
 impl Otp {
-    /// 새로운 OTP 인스턴스 생성
+    /// Create a new OTP instance
     pub fn new(secret: &str, digits: u32, period: u64, otp_type: OtpType) -> Self {
-        // Base32 디코딩
+        // Base32 decoding
         let secret = Self::decode_base32(secret);
         
         Self {
@@ -36,27 +36,27 @@ impl Otp {
         }
     }
 
-    /// 기본 설정으로 TOTP 인스턴스 생성 (6자리, 30초 간격)
+    /// Create a new TOTP instance with default settings (6 digits, 30 second interval)
     pub fn new_totp(secret: &str) -> Self {
         Self::new(secret, 6, 30, OtpType::Totp)
     }
 
-    /// 현재 OTP 코드 생성
+    /// Generate the current OTP code
     pub fn generate_code(&self) -> String {
         match self.otp_type {
             OtpType::Totp => self.generate_totp(),
-            OtpType::Hotp => panic!("HOTP는 카운터 값이 필요합니다. generate_hotp() 메서드를 사용하세요."),
+            OtpType::Hotp => panic!("HOTP requires a counter value. Use the generate_hotp() method."),
         }
     }
 
-    /// TOTP 코드 생성
+    /// Generate the current TOTP code
     fn generate_totp(&self) -> String {
-        // 현재 시간을 Unix 타임스탬프로 변환
+        // Convert the current time to a Unix timestamp
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .expect("시간이 UNIX EPOCH 이전입니다");
+            .expect("Time is before UNIX EPOCH");
         
-        // 현재 시간을 period로 나누어 카운터 값 계산
+        // Divide the current time by the period to calculate the counter value
         let counter = now.as_secs() / self.period;
         
         self.generate_hotp(counter)
@@ -271,7 +271,6 @@ mod tests {
     fn test_hmac_sha1() {
         let otp = Otp::new("JBSWY3DPEHPK3PXP", 6, 30, OtpType::Totp);
         let result = otp.hmac_sha1(&[0, 0, 0, 0, 0, 0, 0, 1]);
-        // 실제 HMAC-SHA1 결과와 비교해야 함
         assert_eq!(result.len(), 20);
     }
     
@@ -281,6 +280,5 @@ mod tests {
         let code = otp.generate_hotp(2);
         println!("code: {}", code);
         assert_eq!(code.len(), 6);
-        // 실제 값은 구현에 따라 달라질 수 있음
     }
 }
