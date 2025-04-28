@@ -7,7 +7,7 @@ use clap::Parser as _;
 use commands::Command;
 use anyhow::Result;
 
-use config::{Account, Config};
+use config::{add_account, delete_account, Account, Config};
 use otp::Otp;
 
 fn main() -> Result<()> {
@@ -23,7 +23,7 @@ fn main() -> Result<()> {
                 println!("No accounts found");
             } else {
                 for (i, account) in accounts.iter().enumerate() {
-                    println!("{}: {}", (i+1), account.name);
+                    println!("{}: name: {}, issuer: {}", (i+1), account.name, account.issuer);
                 }
             }
         }
@@ -40,9 +40,7 @@ fn main() -> Result<()> {
             println!("{}", code);
         }
         Command::Delete { account } => {
-            config.accounts.retain(|acc| acc.name != account);
-            let path = Config::get_path()?;
-            config.save_to_file(&path)?;
+            delete_account(account)?;
 
             println!("Account deleted")
         }
@@ -58,10 +56,11 @@ fn main() -> Result<()> {
             println!("Account loaded")
         }
         Command::Import { file } => {
-            // let qr = qrcode::parse_qr_from_image(file)?;
-            // println!("{}", qr);
+            let qr = qrcode::parse_qr_from_image(&file)?;
+            add_account(qr.name, qr.secret, qr.issuer)?;
+
+            println!("Account imported")
         }
-        _ => {}
     }
 
     Ok(())

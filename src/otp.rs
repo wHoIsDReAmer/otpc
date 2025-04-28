@@ -39,6 +39,7 @@ impl Otp {
     }
 
     /// Create a new TOTP instance with default settings (6 digits, 30 second interval)
+    #[allow(dead_code)]
     pub fn new_totp(secret: &str) -> Self {
         Self::new(secret, 6, 30, OtpType::Totp)
     }

@@ -36,7 +36,7 @@ impl Config {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Account {
     pub name: String,
     pub secret: String,
@@ -98,15 +98,5 @@ pub(crate) fn delete_account(name: String) -> Result<()> {
         .map_err(|e| anyhow::anyhow!(e.to_string()))?
         .accounts
         .retain(|account| account.name != name);
-    Ok(())
-}
-
-pub(crate) fn sync_config() -> Result<()> {
-    let config_path = Config::get_path()?;
-
-    let config = get_config()?;
-    config.lock()
-        .map_err(|e| anyhow::anyhow!(e.to_string()))?
-        .save_to_file(&config_path)?;
     Ok(())
 }
