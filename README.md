@@ -12,7 +12,7 @@
 
 *   저장된 OTP 계정 목록 표시
 *   특정 계정에 대한 현재 TOTP/HOTP 코드 생성
-*   계정 추가 (직접 로드 또는 QR 코드 임포트 - QR 임포트는 개발 중)
+*   계정 추가 (직접 로드 또는 QR 코드 임포트)
 *   계정 삭제
 *   설정 파일 (`~/.otpc/config.toml`)을 통한 계정 정보 관리
 
@@ -69,7 +69,7 @@ otpc [COMMAND]
     *   `-a`, `--account`: 계정 이름
     *   `-i`, `--issuer` (선택 사항): 발급자 이름
 
-*   **`import`** (개발 중): QR 코드 이미지 파일로부터 OTP 키를 가져옵니다.
+*   **`import`**: QR 코드 이미지 파일로부터 OTP 키를 가져옵니다.
     ```bash
     otpc import -f <path/to/qrcode.png>
     ```
@@ -95,7 +95,7 @@ issuer = "Another Service"
 
 ### 기여
 
-버그 리포트나 기능 제안은 언제나 환영합니다. 이슈를 열거나 풀 리퀘스트를 보내주세요.
+버그 리포트나 기능 제안은 언제나 환영합니다. 이슈를 열거나 PR을 보내주세요.
 
 ### 라이선스
 
@@ -111,7 +111,7 @@ issuer = "Another Service"
 
 *   List saved OTP accounts
 *   Generate the current TOTP/HOTP code for a specific account
-*   Add accounts (manual load or QR code import - QR import is under development)
+*   Add accounts (manual load or QR code import)
 *   Delete accounts
 *   Manage account information via a configuration file (`~/.otpc/config.toml`)
 
@@ -168,7 +168,7 @@ otpc [COMMAND]
     *   `-a`, `--account`: The account name.
     *   `-i`, `--issuer` (optional): The issuer name.
 
-*   **`import`** (Under development): Imports an OTP key from a QR code image file.
+*   **`import`**: Imports an OTP key from a QR code image file.
     ```bash
     otpc import -f <path/to/qrcode.png>
     ```
