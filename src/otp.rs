@@ -10,6 +10,7 @@ pub enum OtpType {
 }
 
 /// OTP 알고리즘 구현
+/// 참조 RFC: https://datatracker.ietf.org/doc/html/rfc4226
 pub struct Otp {
     /// 비밀 키
     secret: Vec<u8>,
