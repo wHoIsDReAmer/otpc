@@ -7,7 +7,8 @@ use clap::Parser as _;
 use commands::Command;
 use anyhow::Result;
 
-use otp::{Otp, OtpType};
+use config::{Account, Config};
+use otp::Otp;
 
 fn main() -> Result<()> {
     let mut config = config::get_config()?
@@ -17,20 +18,44 @@ fn main() -> Result<()> {
     let command = Command::parse();
     match command {
         Command::List => {
-            for account in config.accounts.iter() {
-                println!("{}", account.name);
+            let accounts = config.accounts.clone();
+            if accounts.is_empty() {
+                println!("No accounts found");
+            } else {
+                for (i, account) in accounts.iter().enumerate() {
+                    println!("{}: {}", (i+1), account.name);
+                }
             }
         }
-        Command::Code { account } => {
+        Command::Code { account, otp_type, counter } => {
             let account = config.accounts.iter().find(|acc| acc.name == account)
                 .ok_or(anyhow::anyhow!("Account not found"))?;
 
-            let otp = Otp::new(account.secret.as_str(), 6, 30, OtpType::Totp);
-            let code = otp.generate_code();
+            let otp = Otp::new(account.secret.as_str(), 6, 30, otp_type);
+            let code = match counter {
+                Some(counter) => otp.generate_hotp(counter),
+                None => otp.generate_code(),
+            };
+
             println!("{}", code);
         }
         Command::Delete { account } => {
             config.accounts.retain(|acc| acc.name != account);
+            let path = Config::get_path()?;
+            config.save_to_file(&path)?;
+
+            println!("Account deleted")
+        }
+        Command::Load { secret, account, issuer } => {
+            config.accounts.push(Account {
+                name: account,
+                secret,
+                issuer: issuer.unwrap_or("host".to_string()),
+            });
+            let path = Config::get_path()?;
+            config.save_to_file(&path)?;
+
+            println!("Account loaded")
         }
         Command::Import { file } => {
             // let qr = qrcode::parse_qr_from_image(file)?;

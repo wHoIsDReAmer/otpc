@@ -1,5 +1,7 @@
 use clap::Parser;
 
+use crate::otp::OtpType;
+
 #[derive(Parser, Debug, Clone)]
 pub enum Command {
     /// Show all saved OTP keys
@@ -12,6 +14,14 @@ pub enum Command {
         /// The name or ID of the account
         #[clap(long, short)]
         account: String,
+
+        /// The type of OTP code to generate
+        #[clap(long, short, default_value = "totp")]
+        otp_type: OtpType,
+
+        /// The counter value for HOTP
+        #[clap(long, short)]
+        counter: Option<u64>,
     },
     
     /// Delete an account
@@ -40,6 +50,10 @@ pub enum Command {
         /// The account name
         #[clap(long, short)]
         account: String,
+
+        /// The issuer name
+        #[clap(long, short)]
+        issuer: Option<String>,
     },
     
 }

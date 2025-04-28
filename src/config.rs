@@ -36,7 +36,7 @@ impl Config {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Account {
     pub name: String,
     pub secret: String,

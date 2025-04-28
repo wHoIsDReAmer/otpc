@@ -1,7 +1,9 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::fmt;
+use clap::ValueEnum;
 
 /// OTP Type (TOTP or HOTP)
+#[derive(ValueEnum, Debug, Clone, PartialEq, Eq)]
 pub enum OtpType {
     /// Time-based OTP (TOTP)
     Totp,
