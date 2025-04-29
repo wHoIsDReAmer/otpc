@@ -1,0 +1,94 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build_and_release:
+    name: Build and Release for ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            name: linux-x86_64
+          - target: x86_64-apple-darwin
+            os: ubuntu-latest
+            name: macos-x86_64
+          - target: x86_64-pc-windows-gnu
+            os: ubuntu-latest
+            name: windows-x86_64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross --rev 9131ba6
+
+      - name: Build binary
+        run: cross build --release --target ${{ matrix.target }} --verbose
+
+      - name: Package binary for ${{ matrix.name }}
+        shell: bash
+        run: |
+          BINARY_NAME=otpc
+          TAG_NAME=${GITHUB_REF_NAME}
+          ARTIFACT_NAME="${BINARY_NAME}-${TAG_NAME}-${{ matrix.name }}"
+
+          if [[ "${{ matrix.target }}" == *"-windows-"* ]]; then
+            SOURCE_DIR="target/${{ matrix.target }}/release"
+            BINARY_PATH="${SOURCE_DIR}/${BINARY_NAME}.exe"
+            ARCHIVE_NAME="${ARTIFACT_NAME}.zip"
+            cd "${SOURCE_DIR}"
+            zip "../../../${ARCHIVE_NAME}" "${BINARY_NAME}.exe"
+            cd ../../..
+            echo "ASSET_PATH=${ARCHIVE_NAME}" >> $GITHUB_ENV
+            echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> $GITHUB_ENV
+          else
+            SOURCE_DIR="target/${{ matrix.target }}/release"
+            BINARY_PATH="${SOURCE_DIR}/${BINARY_NAME}"
+            ARCHIVE_NAME="${ARTIFACT_NAME}.tar.gz"
+            tar czvf "${ARCHIVE_NAME}" -C "${SOURCE_DIR}" "${BINARY_NAME}"
+            echo "ASSET_PATH=${ARCHIVE_NAME}" >> $GITHUB_ENV
+            echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> $GITHUB_ENV
+          fi
+
+          echo "Packaged: ${ARCHIVE_NAME}"
+          echo "Asset Path: $(pwd)/${ARCHIVE_NAME}"
+
+      - name: Upload artifact (${{ matrix.name }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: ${{ env.ASSET_PATH }}
+
+  release:
+    name: Create Release
+    needs: build_and_release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List downloaded artifacts
+        run: ls -R artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/*/*
+          fail_on_unmatched_files: true
