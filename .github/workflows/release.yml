@@ -15,9 +15,6 @@ jobs:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
             name: linux-x86_64
-          - target: x86_64-apple-darwin
-            os: ubuntu-latest
-            name: macos-x86_64
           - target: x86_64-pc-windows-gnu
             os: ubuntu-latest
             name: windows-x86_64
