@@ -1,6 +1,9 @@
-use std::fs::{self, File, OpenOptions, Permissions};
+use std::fs::{self, File, OpenOptions};
 use std::io::{self, Read as _, Seek as _, SeekFrom, Write as _};
+
+#[cfg(unix)]
 use std::os::unix::fs::PermissionsExt as _;
+
 use std::path::PathBuf;
 use std::env;
 use std::sync::{LazyLock, Mutex};
@@ -59,7 +62,7 @@ fn load_config() -> Result<Config> {
                     .open(&config_path)?;
 
                 #[cfg(unix)]
-                new_config_file.set_permissions(Permissions::from_mode(0o600))?;
+                new_config_file.set_permissions(std::fs::Permissions::from_mode(0o600))?;
 
                 let new_config = Config { accounts: vec![] };
                 let new_config_str = toml::to_string(&new_config).map_err(|e| anyhow::anyhow!(e))?;
