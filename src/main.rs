@@ -7,7 +7,7 @@ use clap::Parser as _;
 use commands::Command;
 use anyhow::Result;
 
-use config::{add_account, delete_account, Account, Config};
+use config::{Account, Config};
 use otp::Otp;
 
 fn main() -> Result<()> {
@@ -40,11 +40,18 @@ fn main() -> Result<()> {
             println!("{}", code);
         }
         Command::Delete { account } => {
-            delete_account(account)?;
+            config.accounts.retain(|acc| acc.name != account);
+            let path = Config::get_path()?;
+            config.save_to_file(&path)?;
 
             println!("Account deleted")
         }
         Command::Load { secret, account, issuer } => {
+            if config.accounts.iter().any(|acc| acc.name == account) {
+                println!("Account already exists");
+                return Ok(());
+            }
+
             config.accounts.push(Account {
                 name: account,
                 secret,
@@ -57,7 +64,9 @@ fn main() -> Result<()> {
         }
         Command::Import { file } => {
             let qr = qrcode::parse_qr_from_image(&file)?;
-            add_account(qr.name, qr.secret, qr.issuer)?;
+            config.accounts.push(qr);
+            let path = Config::get_path()?;
+            config.save_to_file(&path)?;
 
             println!("Account imported")
         }

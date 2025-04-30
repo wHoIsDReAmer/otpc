@@ -81,22 +81,3 @@ fn load_config() -> Result<Config> {
 pub(crate) fn get_config() -> Result<&'static Mutex<Config>> {
     Ok(&CONFIG)
 }
-
-pub(crate) fn add_account(name: String, secret: String, issuer: String) -> Result<()> {
-    let config = get_config()?;
-
-    config.lock()
-        .map_err(|e| anyhow::anyhow!(e.to_string()))?
-        .accounts
-        .push(Account { name, secret, issuer });
-    Ok(())
-}
-
-pub(crate) fn delete_account(name: String) -> Result<()> {
-    let config = get_config()?;
-    config.lock()
-        .map_err(|e| anyhow::anyhow!(e.to_string()))?
-        .accounts
-        .retain(|account| account.name != name);
-    Ok(())
-}
