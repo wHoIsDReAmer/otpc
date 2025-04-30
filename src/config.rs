@@ -57,6 +57,8 @@ fn load_config() -> Result<Config> {
                     .write(true)
                     .read(true)
                     .open(&config_path)?;
+
+                #[cfg(unix)]
                 new_config_file.set_permissions(Permissions::from_mode(0o600))?;
 
                 let new_config = Config { accounts: vec![] };
