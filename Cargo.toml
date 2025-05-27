@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [profile.release]
-opt-level = 3      # 최대 최적화 레벨
-lto = true         # 링크 타임 최적화 활성화
-codegen-units = 1  # 코드 생성 유닛 수를 줄여 잠재적으로 더 나은 최적화 (컴파일 시간 증가)
-panic = 'abort'    # 패닉 시 스택 해제 대신 중단 (바이너리 크기 감소)
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = 'abort'
 strip = true       # 바이너리에서 심볼 제거
 
 [dependencies]
