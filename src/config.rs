@@ -59,6 +59,7 @@ fn load_config() -> Result<Config> {
                     .create(true)
                     .write(true)
                     .read(true)
+                    .truncate(true)
                     .open(&config_path)?;
 
                 #[cfg(unix)]
@@ -79,7 +80,9 @@ fn load_config() -> Result<Config> {
     let mut config_str = String::new();
     config_file.read_to_string(&mut config_str)?;
 
-    let config: Config = toml::from_str(&config_str).map_err(|e| anyhow::anyhow!(e))?;
+    let config: Config = toml::from_str(&config_str)
+        .map_err(|e| anyhow::anyhow!(e))?;
+    
     Ok(config)
 }
 
