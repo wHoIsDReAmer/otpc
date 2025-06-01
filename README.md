@@ -99,7 +99,7 @@ issuer = "Another Service"
 
 ### 라이선스
 
-이 프로젝트는 [라이선스 이름 - 예: MIT] 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하십시오. (프로젝트에 라이선스 파일 추가 필요)
+이 프로젝트는 [라이선스 이름 - 예: MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하십시오.
 
 ---
 
@@ -198,4 +198,4 @@ Bug reports and feature suggestions are always welcome. Please open an issue or 
 
 ### License
 
-This project is distributed under the [License Name - e.g., MIT] license. See the `LICENSE` file for details. (Need to add a LICENSE file to the project). 
+This project is distributed under the MIT license. See the `LICENSE` file for details.
